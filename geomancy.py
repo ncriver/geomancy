@@ -5,36 +5,49 @@ class Geofigure(object):
     """The class represents the building block of a geomancy fortune casting session.
     Each Geofigure object represents a geomancy figure formed by throwing a two-faced die four times."""        
     def __init__(self, first, second, third, fourth):
-        dots = [first, second, third, fourth]
-        self.dots = []
+        nums = [first, second, third, fourth]
+        self.nums = []
         self.elem_order = ['fire', 'air', 'water', 'earth']
         self.elementals = collections.OrderedDict()
+        self.update(*nums)
 
-        for dot, elem in zip(dots, self.elem_order):
-            dot_num = self.even_odd_num(dot)
-            self.dots.append(dot_num)
-            self.elementals[elem] = dot_num
-        
-    def even_odd_num(self, number):
-        return 2-(number%2)
+    def get_one_or_two(self, number):
+        """Returns 1 for odd number input and 2 for even number input."""
+        return 2-(int(number)%2)
+
+    def update(self, first, second, third, fourth):
+        """Updates the numbers in Geofigure object"""
+        nums = [first, second, third, fourth]
+
+        for num, elem in zip(nums, self.elem_order):
+            one_or_two = self.get_one_or_two(num)
+            self.nums.append(one_or_two)
+            self.elementals[elem] = one_or_two
+
     def add(self, another):
         new_dots = []
-        for i in range(len(self.dots)):
-            new_dots.append(self.dots[i] + another.dots[i])     
-        return Geofigure(*new_dots)
+        for i in range(len(self.nums)):
+            new_dots.append(self.nums[i] + another.nums[i])
+        return type(self)(*new_dots)
+
     def __eq__(self, another):
         if isinstance(another, Geofigure):
-            return self.dots == another.dots
+            return self.nums == another.nums
         else:
             return False
+    
     def num_value(self):
         value = 0
-        for i in range(len(self.dots)):
-            value += self.dots[i]*(2**i)
+        for i in range(len(self.nums)):
+            value += self.nums[i]*(2**i)
         return value
+
+    def get_name(self):
+        pass
+
     def __str__(self):
         pretty_str = ''
-        for d in self.dots:
+        for d in self.nums:
              if d % 2 == 1:
                  pretty_str += ' * \n'
              else:
@@ -42,24 +55,23 @@ class Geofigure(object):
         pretty_str = pretty_str[0:-1]
         return pretty_str
     def __repr__(self):
-        return "Geofigure:" + self.dots.__repr__()
+        return "Geofigure:" + self.nums.__repr__()
+
     @classmethod
     def quick_throw(cls):
         throw_results = []
         for i in range(4):
             throw_results.append(random.randint(1,2))
         return cls(*throw_results)
-
         
-
 class Geoshield(object):
     def __init__(self, firstm, secondm, thirdm, fourthm):
         self.mothers = [firstm, secondm, thirdm, fourthm]
         self.daughters = []
-        for i in range(len(self.mothers[0].dots)):
+        for i in range(len(self.mothers[0].nums)):
             new_dots = []
             for j in range(len(self.mothers)):
-                new_dots.append(self.mothers[j].dots[i])
+                new_dots.append(self.mothers[j].nums[i])
             self.daughters.append(Geofigure(*new_dots))
         self.nieces = []
         self.nieces.append(self.mothers[0].add(self.mothers[1]))
@@ -120,15 +132,5 @@ class Geoshield(object):
             merged_list.extend(second_list[min_len:])
         return '\n'.join(merged_list)
        
-
-
-def run_test():
-    new_vals = [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1]
-    moms = []
-    for i in range(4):
-        moms.append(Geofigure(*new_vals[i*4:(i*4)+4]))
-    return Geoshield(*moms)
-
-    
-
-            
+if __name__ == "__main__":
+	print(Geoshield.quick_divine().shield_diagram())
