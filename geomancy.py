@@ -5,26 +5,38 @@ class Geofigure(object):
     """The class represents the building block of a geomancy fortune casting session.
     Each Geofigure object represents a geomancy figure formed by throwing a two-faced die four times."""        
     def __init__(self, first, second, third, fourth):
-        nums = [first, second, third, fourth]
-        self.nums = []
+        self.nums = [first, second, third, fourth]
         self.elem_order = ['fire', 'air', 'water', 'earth']
         self.elementals = collections.OrderedDict()
-        self.update(*nums)
+        for num, elem in zip(self.nums, self.elem_order):
+            one_or_two = self.get_one_or_two(num)
+            self.elementals[elem] = one_or_two
+        self.set_name()
 
     def get_one_or_two(self, number):
         """Returns 1 for odd number input and 2 for even number input."""
         return 2-(int(number)%2)
 
+    def set_name(self):
+        num_string = ""
+        for num in self.nums:
+            num_string += str(num)
+
+        latin_names = collections.OrderedDict([('0010', 'puer'), ('0100', 'puella')])
+        self.name = "Unset"
+        if num_string in latin_names:
+            self.name = latin_names[num_string]
+        return self.name
+
     def update(self, first, second, third, fourth):
         """Updates the numbers in Geofigure object"""
-        nums = [first, second, third, fourth]
-
-        for num, elem in zip(nums, self.elem_order):
+        self.nums = [first, second, third, fourth]
+        for num, elem in zip(self.nums, self.elem_order):
             one_or_two = self.get_one_or_two(num)
-            self.nums.append(one_or_two)
             self.elementals[elem] = one_or_two
 
     def add(self, another):
+        "Adds two figures and returns a new Geofigure object."
         new_dots = []
         for i in range(len(self.nums)):
             new_dots.append(self.nums[i] + another.nums[i])
@@ -133,4 +145,7 @@ class Geoshield(object):
         return '\n'.join(merged_list)
        
 if __name__ == "__main__":
-	print(Geoshield.quick_divine().shield_diagram())
+    print(Geoshield.quick_divine().shield_diagram())
+    a = Geofigure(0,0,1,0)
+    a.set_name()
+    print(a.name)
