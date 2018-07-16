@@ -5,9 +5,10 @@ class Geofigure(object):
     """The class represents the building block of a geomancy fortune casting session.
     Each Geofigure object represents a geomancy figure formed by throwing a two-faced die four times."""        
     def __init__(self, first, second, third, fourth):
-        self.nums = [first, second, third, fourth]
         self.elem_order = ['fire', 'air', 'water', 'earth']
         self.elementals = collections.OrderedDict()
+        self.nums = [first, second, third, fourth]
+        self.nums = [self.get_one_or_two(x) for x in self.nums]
         for num, elem in zip(self.nums, self.elem_order):
             one_or_two = self.get_one_or_two(num)
             self.elementals[elem] = one_or_two
@@ -22,7 +23,7 @@ class Geofigure(object):
         for num in self.nums:
             num_string += str(num)
 
-        latin_names = collections.OrderedDict([('0010', 'puer'), ('0100', 'puella')])
+        latin_names = collections.OrderedDict([('1121', 'puer'), ('1211', 'puella')])
         self.name = "Unset"
         if num_string in latin_names:
             self.name = latin_names[num_string]
@@ -31,6 +32,7 @@ class Geofigure(object):
     def update(self, first, second, third, fourth):
         """Updates the numbers in Geofigure object"""
         self.nums = [first, second, third, fourth]
+        self.nums = [self.get_one_or_two(x) for x in self.nums]
         for num, elem in zip(self.nums, self.elem_order):
             one_or_two = self.get_one_or_two(num)
             self.elementals[elem] = one_or_two
@@ -146,6 +148,6 @@ class Geoshield(object):
        
 if __name__ == "__main__":
     print(Geoshield.quick_divine().shield_diagram())
-    a = Geofigure(0,0,1,0)
+    a = Geofigure(1,1,2,1)
     a.set_name()
     print(a.name)
