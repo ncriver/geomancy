@@ -1,7 +1,7 @@
 import random
 import collections
 
-class Geofigure(object):
+class Figure(object):
     """The class represents the building block of a geomancy fortune casting session.
     Each Geofigure object represents a geomancy figure formed by throwing a two-faced die four times."""        
     def __init__(self, first, second, third, fourth):
@@ -22,7 +22,6 @@ class Geofigure(object):
         num_string = ""
         for num in self.nums:
             num_string += str(num)
-
         latin_names = collections.OrderedDict([('1121', 'puer'), ('1211', 'puella')])
         self.name = "Unset"
         if num_string in latin_names:
@@ -37,7 +36,7 @@ class Geofigure(object):
             one_or_two = self.get_one_or_two(num)
             self.elementals[elem] = one_or_two
 
-    def add(self, another):
+    def __add__(self, another):
         "Adds two figures and returns a new Geofigure object."
         new_dots = []
         for i in range(len(self.nums)):
@@ -45,7 +44,7 @@ class Geofigure(object):
         return type(self)(*new_dots)
 
     def __eq__(self, another):
-        if isinstance(another, Geofigure):
+        if isinstance(another, Figure):
             return self.nums == another.nums
         else:
             return False
@@ -78,7 +77,7 @@ class Geofigure(object):
             throw_results.append(random.randint(1,2))
         return cls(*throw_results)
         
-class Geoshield(object):
+class Shield(object):
     def __init__(self, firstm, secondm, thirdm, fourthm):
         self.mothers = [firstm, secondm, thirdm, fourthm]
         self.daughters = []
@@ -86,24 +85,24 @@ class Geoshield(object):
             new_dots = []
             for j in range(len(self.mothers)):
                 new_dots.append(self.mothers[j].nums[i])
-            self.daughters.append(Geofigure(*new_dots))
+            self.daughters.append(Figure(*new_dots))
         self.nieces = []
-        self.nieces.append(self.mothers[0].add(self.mothers[1]))
-        self.nieces.append(self.mothers[2].add(self.mothers[3]))
-        self.nieces.append(self.daughters[0].add(self.daughters[1]))
-        self.nieces.append(self.daughters[2].add(self.daughters[3]))
-        self.right_witness = self.nieces[0].add(self.nieces[1])
-        self.left_witness = self.nieces[2].add(self.nieces[3])
-        self.judge = self.right_witness.add(self.left_witness)
+        self.nieces.append(self.mothers[0] + self.mothers[1])
+        self.nieces.append(self.mothers[2] + self.mothers[3])
+        self.nieces.append(self.daughters[0] + self.daughters[1])
+        self.nieces.append(self.daughters[2] + self.daughters[3])
+        self.right_witness = self.nieces[0] + self.nieces[1]
+        self.left_witness = self.nieces[2] + self.nieces[3]
+        self.judge = self.right_witness + self.left_witness
 
     @classmethod
-    def quick_divine(cls):
+    def quick_cast(cls):
         mothers = []
         for i in range(0, 4):
-            mothers.append(Geofigure.quick_throw())
+            mothers.append(Figure.quick_throw())
         return cls(*mothers)
     
-    def shield_diagram(self):
+    def text_art(self):
         mother_str = str(self.mothers[0])
         for m in self.mothers[1:]:
             mother_str = self.merge_strings(mother_str, str(m), False, ' | ')
@@ -126,7 +125,6 @@ class Geoshield(object):
         output_str += judge_str
         return output_str
        
-        
     def merge_strings(self, first, second, ltor_order = True, between_char = ''):
         first_list = first.split('\n')
         second_list = second.split('\n')
@@ -147,7 +145,7 @@ class Geoshield(object):
         return '\n'.join(merged_list)
        
 if __name__ == "__main__":
-    print(Geoshield.quick_divine().shield_diagram())
-    a = Geofigure(1,1,2,1)
+    print(Shield.quick_cast().text_art())
+    a = Figure(1,1,2,1)
     a.set_name()
     print(a.name)
