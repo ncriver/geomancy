@@ -1,5 +1,5 @@
-
 import tkinter as tk
+from geomancy import Shield
 
 class GeomancyApplication(tk.Frame):
     def __init__(self, master=None):
@@ -12,6 +12,10 @@ class GeomancyApplication(tk.Frame):
         # Enter your question.
         # Throw dice button.
         # Display for the chart.
+        pass
+
+    def draw_chart(self):
+        my_shield = Shield.quick_cast()
 
 class Application(tk.Frame):
     def __init__(self, master=None):
