@@ -1,15 +1,30 @@
 from geomancy import Figure, Shield
+from itertools import product
 
 def test_easy_figure():
-    seed = [1,2,1,2]
+    seed = (1,2,1,2)
     a = Figure(*seed)
     assert a.nums == seed
 
 def test_hard_figure():
-    seed = [0,3,6,2]
-    answer = [2,1,2,2]
+    seed = (0,3,6,2)
+    answer = (2,1,2,2)
     a = Figure(*seed)
     assert a.nums == answer
+
+def test_names():
+    total_num_figures = 16
+    dots = product((1,2),repeat=4)
+    figures = {}
+    for d in dots:
+        figures[d] = Figure(*d)
+        assert figures[d].name != 'Unset'
+    assert len(figures) == total_num_figures
+
+def test_correct_name():
+    a = Figure(1,1,2,1)
+    correct_name = 'Puer'
+    assert a.name == correct_name
 
 def test_add():
     a = Figure(1,2,1,2)
