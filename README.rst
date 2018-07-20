@@ -14,4 +14,4 @@ Examples
 
 Links
 -----
-* https://github.com/nc111/geomancy
+* https://github.com/ncriver/geomancy
