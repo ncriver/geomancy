@@ -1,10 +1,17 @@
 
-# coding: utf-8
-
-# In[7]:
-
-
 import tkinter as tk
+
+class GeomancyApplication(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.grid()
+        self.create_widgets()
+
+    def create_widgets(self):
+        # Enter the date.
+        # Enter your question.
+        # Throw dice button.
+        # Display for the chart.
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -24,6 +31,7 @@ class Application(tk.Frame):
     
     def say_hi(self):
         print("hi there, everyone!")
+
 
 class PhoneApp(tk.Frame):
     def __init__(self, master=None):
