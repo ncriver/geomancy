@@ -1,3 +1,4 @@
+from .context import geomancy
 from geomancy import Figure, Shield
 from itertools import product
 
