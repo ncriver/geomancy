@@ -71,13 +71,28 @@ class Figure(object):
         return "Figure" + tuple(self.nums).__repr__()
 
     def __str__(self):
+        width = 5
+        if width < 3:
+            width = 3
+        
         pretty_str = ''
         for d in self.nums:
              if d % 2 == 1:
-                 pretty_str += ' * \n'
+                 pretty_str += '*'.center(width) + '\n'
              else:
-                 pretty_str += '* *\n'
-        pretty_str = pretty_str[0:-1]
+                 pretty_str += '* *'.center(width) + '\n'
+        short_name = self.get_name()
+        if short_name == 'Fortuna Major':
+            short_name = 'Major'
+        elif short_name == 'Fortuna Minor':
+            short_name = 'Minor'
+        else:
+            short_name = short_name[0:width]
+            
+        if len(short_name) < width:
+            short_name = short_name.center(width)
+        pretty_str += short_name
+        # pretty_str = pretty_str[0:-1]
         return pretty_str
 
     def __hash__(self):
@@ -85,6 +100,7 @@ class Figure(object):
 
     @classmethod
     def quick_throw(cls):
+        """A class method that returns a Figure object with a random set of numbers."""
         throw_results = []
         for i in range(4):
             throw_results.append(random.randint(1,2))
@@ -110,6 +126,7 @@ class Shield(object):
 
     @classmethod
     def quick_cast(cls):
+        """A class method that returns a Shield object formed from four random Figure objects."""
         mothers = []
         for i in range(0, 4):
             mothers.append(Figure.quick_throw())
@@ -117,27 +134,43 @@ class Shield(object):
     
     def text_art(self):
         mother_str = str(self.mothers[0])
+        # Desired width of the figure, including padding.
+        figure_width = max(7,len(mother_str.split('\n')[0]))
+        figure_height = len(mother_str.split('\n'))
+        figure_separator = '|'
+        art_width = figure_width * 8 + len(figure_separator) * 7
+        # Centering and padding mother_str
+        mother_str = self.center_lines(mother_str, figure_width)
         for m in self.mothers[1:]:
-            mother_str = self.merge_strings(mother_str, str(m), False, ' | ')
-        daughter_str = str(self.daughters[0])
+            mother_str = self.merge_strings(mother_str, self.center_lines(str(m), figure_width), False, figure_separator)
+        daughter_str = self.center_lines(str(self.daughters[0]), figure_width)
         for d in self.daughters[1:]:
-            daughter_str = self.merge_strings(daughter_str, str(d), False, ' | ')
-        output_str = self.merge_strings(mother_str, daughter_str, False, ' | ')
-        row_separator = '-'*45
+            daughter_str = self.merge_strings(daughter_str, self.center_lines(str(d), figure_width), False, figure_separator)
+        output_str = self.merge_strings(mother_str, daughter_str, False, figure_separator)
+        
+        row_separator = '-' * art_width
         output_str += '\n' + row_separator + '\n'
-        niece_str = self.merge_strings(str(self.nieces[0]), '   \n'*4)
+        
+        niece_width = figure_width * 2 + len(figure_separator)
+        niece_str = self.center_lines(str(self.nieces[0]),niece_width)
         for n in self.nieces[1:]:
-            niece_str = self.merge_strings(niece_str, str(n), False, '    |    ')
-        niece_str = self.merge_strings('   \n'*4, niece_str)
-        output_str += niece_str + row_separator + '\n'
-        witness_str = self.merge_strings(str(self.left_witness), str(self.right_witness), True, ' '*9+'|'+' '*9)
-        witness_str = self.merge_strings((' '*10+'\n')*4, witness_str)
-        output_str += witness_str   
+            niece_str = self.merge_strings(niece_str, self.center_lines(str(n), niece_width), False, figure_separator)
+        output_str += niece_str + '\n' + row_separator + '\n'
+        
+        witness_width = niece_width * 2 + len(figure_separator)
+        witness_str = self.merge_strings(self.center_lines(str(self.left_witness), witness_width),
+                                         self.center_lines(str(self.right_witness), witness_width), True, figure_separator )
+        output_str += witness_str + '\n'
         output_str += row_separator + '\n'
-        judge_str = self.merge_strings((' '*21+'\n')*4, str(self.judge))
+        
+        judge_str = self.center_lines(str(self.judge), art_width)
         output_str += judge_str
         return output_str
-       
+    
+    def center_lines(self, lines, width):
+        line_list = [s.center(width) for s in lines.split('\n')]
+        return '\n'.join(line_list)
+    
     def merge_strings(self, first, second, ltor_order = True, between_char = ''):
         first_list = first.split('\n')
         second_list = second.split('\n')
