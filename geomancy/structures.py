@@ -138,6 +138,12 @@ class Shield(object):
         self.right_witness = self.nieces[0] + self.nieces[1]
         self.left_witness = self.nieces[2] + self.nieces[3]
         self.judge = self.right_witness + self.left_witness
+        self.index = []
+        self.index.extend(self.mothers)
+        self.index.extend(self.daughters)
+        self.index.extend(self.nieces)
+        self.index.extend([self.right_witness,self.left_witness,self.judge])
+
 
     @classmethod
     def quick_cast(cls):
@@ -149,39 +155,68 @@ class Shield(object):
     
     def text_art(self):
         mother_str = str(self.mothers[0])
-        # Desired width of the mother figures. Has to be based on the widest member in the shield for safety.
-        all_mdn_figures = self.mothers.copy()
-        all_mdn_figures.extend(self.daughters)
-        all_mdn_figures.extend(self.nieces)
-        max_width = max([len(fig.get_name()) for fig in all_mdn_figures])
-        figure_width = max_width
         figure_height = len(mother_str.split('\n'))
         figure_separator = '|'
-        art_width = figure_width * 8 + len(figure_separator) * 7
+        # We need to get the optimal width for the figures at each row.
+        ## We first get width of the Figure with the longest name.
+        rows = []
+        rows.append(self.mothers.copy() + self.daughters)
+        rows.append(self.nieces)
+        rows.append([self.right_witness,self.left_witness])
+        rows.append([self.judge])
+        max_widths = []
+        for figures in rows:
+            widths = [len(x.get_name()) for x in figures]
+            max_widths.append(max(widths))
+
+        # We now see if an optimal set of widths exists.
+        def quo_mod(dividend, divisor):
+            return (dividend // divisor, dividend % divisor,)
+        for poss_width in range(40,100):
+            quos, mods = zip(*map(quo_mod, [poss_width-7, poss_width-3, poss_width-1, poss_width], [8,4,2,1]))
+            conditions = []
+            conditions.append(sum(mods) == 0)
+            for q, mw in zip(quos,max_widths):
+                conditions.append(q >= mw)
+            if all(conditions):
+                art_width = poss_width
+                for i, q in enumerate(quos):
+                    max_widths[i] = q
+                    break
+
+        # If an optimal set of widths do not exist, we fall back to 
+        ## the width of the figure with the longest name in all the charts.
+        if not all(conditions):
+            all_max = max(max_widths)
+            # We have to set the width of the figure for each row differently.
+            lfs = len(figure_separator)
+            max_widths = [all_max, all_max * 2 + lfs, all_max * 4 + lfs * 3, all_max * 8 + lfs * 7]
+            art_width = all_max * 8 + lfs * 7
+        mother_width = max_widths[0]
         # Centering and padding mother_str
-        mother_str = center_lines(mother_str, figure_width)
+        mother_str = center_lines(mother_str, mother_width)
         for m in self.mothers[1:]:
-            mother_str = merge_strings(center_lines(str(m), figure_width), mother_str, figure_separator)
-        daughter_str = center_lines(str(self.daughters[0]), figure_width)
+            mother_str = merge_strings(center_lines(str(m), mother_width), mother_str, figure_separator)
+        daughter_str = center_lines(str(self.daughters[0]), mother_width)
         for d in self.daughters[1:]:
-            daughter_str = merge_strings(center_lines(str(d), figure_width), daughter_str, figure_separator)
+            daughter_str = merge_strings(center_lines(str(d), mother_width), daughter_str, figure_separator)
         output_str = merge_strings(daughter_str, mother_str, figure_separator)
         
         row_separator = '-' * art_width
         output_str += '\n' + row_separator + '\n'
         
-        niece_width = figure_width * 2 + len(figure_separator)
+        niece_width = max_widths[1]
         niece_str = center_lines(str(self.nieces[0]),niece_width)
         for n in self.nieces[1:]:
             niece_str = merge_strings(center_lines(str(n), niece_width), niece_str, figure_separator)
         output_str += niece_str + '\n' + row_separator + '\n'
         
-        witness_width = niece_width * 2 + len(figure_separator)
+        witness_width = max_widths[2]
         witness_str = merge_strings(center_lines(str(self.left_witness), witness_width),
                                          center_lines(str(self.right_witness), witness_width), figure_separator )
         output_str += witness_str + '\n'
         output_str += row_separator + '\n'
         
-        judge_str = center_lines(str(self.judge), art_width)
+        judge_str = center_lines(str(self.judge), max_widths[3])
         output_str += judge_str
         return output_str
