@@ -1,5 +1,5 @@
 import tkinter as tk
-from geomancy import Shield
+from structures import Shield
 
 class GeomancyApplication(tk.Frame):
     def __init__(self, master=None):
