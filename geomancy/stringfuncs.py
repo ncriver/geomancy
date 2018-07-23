@@ -2,7 +2,7 @@ def center_lines(lines, width):
     line_list = [s.center(width) for s in lines.split('\n')]
     return '\n'.join(line_list)
     
-def merge_strings(first, second, between_char = ''):
+def merge_lines(first, second, between_char = ''):
     """Merges the lines of two string inputs into single lines in left-right order."""
     first_lines = first.split('\n')
     second_lines = second.split('\n')
