@@ -1,5 +1,6 @@
 import random
 from collections import OrderedDict
+from .stringfuncs import center_lines, merge_strings
 
 class Figure(object):
     """The class represents the building block of a geomancy fortune casting session.
@@ -71,9 +72,9 @@ class Figure(object):
         return "Figure" + tuple(self.nums).__repr__()
 
     def __str__(self):
-        width = 5
-        if width < 3:
-            width = 3
+        width = len(self.get_name())
+        if width < 5:
+            width = 5
         
         pretty_str = ''
         for d in self.nums:
@@ -81,16 +82,25 @@ class Figure(object):
                  pretty_str += '*'.center(width) + '\n'
              else:
                  pretty_str += '* *'.center(width) + '\n'
-        short_name = self.get_name()
-        if short_name == 'Fortuna Major':
-            short_name = 'Major'
-        elif short_name == 'Fortuna Minor':
-            short_name = 'Minor'
-        else:
-            short_name = short_name[0:width]
-            
+        
+        def get_short_name(name, width):
+            short_name = name
+            if short_name == 'Fortuna Major' and width < len("Fortuna Ma"):
+                short_name = 'Major'[0:width]
+            elif short_name == 'Fortuna Minor' and width < len("Fortuna Mi"):
+                short_name = 'Minor'[0:width]
+            elif short_name == 'Puer' and width < len('Puer'):
+                short_name = 'Pur'[0:width]
+            elif short_name == 'Puella' and width < len('Puer'):
+                short_name = 'Pel'[0:width]
+            else:
+                short_name = short_name[0:width]
+            return short_name
+        
+        short_name = get_short_name(self.get_name(), width)
         if len(short_name) < width:
             short_name = short_name.center(width)
+
         pretty_str += short_name
         # pretty_str = pretty_str[0:-1]
         return pretty_str
@@ -107,6 +117,11 @@ class Figure(object):
         return cls(*throw_results)
         
 class Shield(object):
+    """The class represents the geomantic shield chart formed out of four starting geomantic figure object.
+    
+    Through addition and transposing, the caster forms eleven additional geomantic figures for a total of fiften figures.
+    The __init__() arguments are four Figure objects.
+    """
     def __init__(self, firstm, secondm, thirdm, fourthm):
         self.mothers = [firstm, secondm, thirdm, fourthm]
         self.daughters = []
@@ -134,61 +149,39 @@ class Shield(object):
     
     def text_art(self):
         mother_str = str(self.mothers[0])
-        # Desired width of the figure, including padding.
-        figure_width = max(7,len(mother_str.split('\n')[0]))
+        # Desired width of the mother figures. Has to be based on the widest member in the shield for safety.
+        all_mdn_figures = self.mothers.copy()
+        all_mdn_figures.extend(self.daughters)
+        all_mdn_figures.extend(self.nieces)
+        max_width = max([len(fig.get_name()) for fig in all_mdn_figures])
+        figure_width = max_width
         figure_height = len(mother_str.split('\n'))
         figure_separator = '|'
         art_width = figure_width * 8 + len(figure_separator) * 7
         # Centering and padding mother_str
-        mother_str = self.center_lines(mother_str, figure_width)
+        mother_str = center_lines(mother_str, figure_width)
         for m in self.mothers[1:]:
-            mother_str = self.merge_strings(mother_str, self.center_lines(str(m), figure_width), False, figure_separator)
-        daughter_str = self.center_lines(str(self.daughters[0]), figure_width)
+            mother_str = merge_strings(center_lines(str(m), figure_width), mother_str, figure_separator)
+        daughter_str = center_lines(str(self.daughters[0]), figure_width)
         for d in self.daughters[1:]:
-            daughter_str = self.merge_strings(daughter_str, self.center_lines(str(d), figure_width), False, figure_separator)
-        output_str = self.merge_strings(mother_str, daughter_str, False, figure_separator)
+            daughter_str = merge_strings(center_lines(str(d), figure_width), daughter_str, figure_separator)
+        output_str = merge_strings(daughter_str, mother_str, figure_separator)
         
         row_separator = '-' * art_width
         output_str += '\n' + row_separator + '\n'
         
         niece_width = figure_width * 2 + len(figure_separator)
-        niece_str = self.center_lines(str(self.nieces[0]),niece_width)
+        niece_str = center_lines(str(self.nieces[0]),niece_width)
         for n in self.nieces[1:]:
-            niece_str = self.merge_strings(niece_str, self.center_lines(str(n), niece_width), False, figure_separator)
+            niece_str = merge_strings(center_lines(str(n), niece_width), niece_str, figure_separator)
         output_str += niece_str + '\n' + row_separator + '\n'
         
         witness_width = niece_width * 2 + len(figure_separator)
-        witness_str = self.merge_strings(self.center_lines(str(self.left_witness), witness_width),
-                                         self.center_lines(str(self.right_witness), witness_width), True, figure_separator )
+        witness_str = merge_strings(center_lines(str(self.left_witness), witness_width),
+                                         center_lines(str(self.right_witness), witness_width), figure_separator )
         output_str += witness_str + '\n'
         output_str += row_separator + '\n'
         
-        judge_str = self.center_lines(str(self.judge), art_width)
+        judge_str = center_lines(str(self.judge), art_width)
         output_str += judge_str
         return output_str
-    
-    def center_lines(self, lines, width):
-        line_list = [s.center(width) for s in lines.split('\n')]
-        return '\n'.join(line_list)
-    
-    def merge_strings(self, first, second, ltor_order = True, between_char = ''):
-        first_list = first.split('\n')
-        second_list = second.split('\n')
-
-        if ltor_order:
-            zipped_list = zip(first_list, second_list)
-        else:
-            zipped_list = zip(second_list, first_list)
-        merged_list = []
-        for i in zipped_list:
-            merged_list.append(between_char.join(i))
-
-        min_len = min(len(first_list), len(second_list))        
-        if len(first_list) > len(second_list):
-            merged_list.extend(first_list[min_len:])
-        else:
-            merged_list.extend(second_list[min_len:])
-        return '\n'.join(merged_list)
-       
-if __name__ == "__main__":
-    print(Shield.quick_cast().text_art())
