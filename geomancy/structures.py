@@ -1,6 +1,6 @@
 import random
 from collections import OrderedDict
-from .stringfuncs import center_lines, merge_strings
+from .stringfuncs import center_lines, merge_lines
 
 class Figure(object):
     """The class represents the building block of a geomancy fortune casting session.
@@ -196,11 +196,11 @@ class Shield(object):
         # Centering and padding mother_str
         mother_str = center_lines(mother_str, mother_width)
         for m in self.mothers[1:]:
-            mother_str = merge_strings(center_lines(str(m), mother_width), mother_str, figure_separator)
+            mother_str = merge_lines(center_lines(str(m), mother_width), mother_str, figure_separator)
         daughter_str = center_lines(str(self.daughters[0]), mother_width)
         for d in self.daughters[1:]:
-            daughter_str = merge_strings(center_lines(str(d), mother_width), daughter_str, figure_separator)
-        output_str = merge_strings(daughter_str, mother_str, figure_separator)
+            daughter_str = merge_lines(center_lines(str(d), mother_width), daughter_str, figure_separator)
+        output_str = merge_lines(daughter_str, mother_str, figure_separator)
         
         row_separator = '-' * art_width
         output_str += '\n' + row_separator + '\n'
@@ -208,11 +208,11 @@ class Shield(object):
         niece_width = max_widths[1]
         niece_str = center_lines(str(self.nieces[0]),niece_width)
         for n in self.nieces[1:]:
-            niece_str = merge_strings(center_lines(str(n), niece_width), niece_str, figure_separator)
+            niece_str = merge_lines(center_lines(str(n), niece_width), niece_str, figure_separator)
         output_str += niece_str + '\n' + row_separator + '\n'
         
         witness_width = max_widths[2]
-        witness_str = merge_strings(center_lines(str(self.left_witness), witness_width),
+        witness_str = merge_lines(center_lines(str(self.left_witness), witness_width),
                                          center_lines(str(self.right_witness), witness_width), figure_separator )
         output_str += witness_str + '\n'
         output_str += row_separator + '\n'
@@ -220,3 +220,13 @@ class Shield(object):
         judge_str = center_lines(str(self.judge), max_widths[3])
         output_str += judge_str
         return output_str
+
+    def __repr__(self):
+        mother_args_str = ','.join([repr(m) for m in self.mothers])
+        return 'Shield(' + mother_args_str + ')'
+
+    def __str__(self):
+        output = str(self.mothers[0])
+        for m in self.mothers[1:]:
+            output = merge_lines(str(m), output, '|')
+        return output
