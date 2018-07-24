@@ -12,10 +12,10 @@ This module automates the process of forming the four figures and deriving chart
 
 How to Run
 ----------
-To run, go to the terminal, CD into the top-level folder, and run 
+* To run, go to the terminal, CD into the top-level folder, and run 
 "python run.py".
 
-To run tests, go to the terminal, CD into the top-level folder and run 
+* To run tests, go to the terminal, CD into the top-level folder and run 
 "pytest".
 
 Links
