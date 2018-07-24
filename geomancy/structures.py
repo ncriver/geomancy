@@ -11,6 +11,27 @@ class Figure(object):
         nums = (first, second, third, fourth)
         self.update(*nums)
 
+    # Ordered dictionary mapping number of dots to names.
+    # Initiating them at the class level for easier access by other entities.
+    latin_names = OrderedDict([('1121', 'Puer'),
+                                ('1212', 'Amissio'),
+                                ('2212', 'Albus'),
+                                ('2222', 'Populus'),
+                                ('2211', 'Fortuna Major'),
+                                ('2112', 'Conjunctio'),
+                                ('1211', 'Puella'),
+                                ('2122', 'Rubeus'),
+                                ('2121', 'Acquisitio'),
+                                ('1221', 'Carcer'),
+                                ('2221', 'Tristitia'),
+                                ('1222', 'Laetitia'),
+                                ('1112', 'Cauda Draconis'),
+                                ('2111', 'Caput Draconis'),
+                                ('1122', 'Fortuna Minor'),
+                                ('1111', 'Via')])
+    nu, la = zip(*latin_names.items())
+    longest_name = max(la, key=len)
+
     def get_one_or_two(self, number):
         """Returns 1 for odd number input and 2 for even number input."""
         return 2-(int(number)%2)
@@ -29,25 +50,9 @@ class Figure(object):
         num_string = ""
         for num in self.nums:
             num_string += str(num)
-        latin_names = OrderedDict([('1121', 'Puer'),
-                                    ('1212', 'Amissio'),
-                                    ('2212', 'Albus'),
-                                    ('2222', 'Populus'),
-                                    ('2211', 'Fortuna Major'),
-                                    ('2112', 'Conjunctio'),
-                                    ('1211', 'Puella'),
-                                    ('2122', 'Rubeus'),
-                                    ('2121', 'Acquisitio'),
-                                    ('1221', 'Carcer'),
-                                    ('2221', 'Tristitia'),
-                                    ('1222', 'Laetitia'),
-                                    ('1112', 'Cauda Draconis'),
-                                    ('2111', 'Caput Draconis'),
-                                    ('1122', 'Fortuna Minor'),
-                                    ('1111', 'Via')])
         self.name = "Unset"
-        if num_string in latin_names:
-            self.name = latin_names[num_string]
+        if num_string in self.latin_names:
+            self.name = self.latin_names[num_string]
         return self.name
 
     def get_name(self):
@@ -122,6 +127,8 @@ class Shield(object):
     Through addition and transposing, the caster forms eleven additional geomantic figures for a total of fiften figures.
     The __init__() arguments are four Figure objects.
     """
+    # The total number of mother Figure objects used to generate the chart.
+    num_mothers = 4
     def __init__(self, firstm, secondm, thirdm, fourthm):
         self.mothers = [firstm, secondm, thirdm, fourthm]
         self.daughters = []
