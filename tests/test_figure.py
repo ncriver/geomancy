@@ -34,6 +34,14 @@ def test_add():
     answer = Figure(2,2,1,1)
     assert answer == (a + b)
 
+def test_latin_names():
+    cls_dict = Figure.latin_names
+    a = Figure.quick_throw()
+    obj_dict = a.latin_names
+    assert cls_dict == obj_dict
+    assert 'Puella' in obj_dict.values()
+
+
 def run_test():
     new_vals = [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1]
     moms = []
