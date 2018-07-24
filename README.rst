@@ -10,8 +10,13 @@ The 20th century magic society Golden Dawn worked on geomancy's revival. Ecologi
 
 This module automates the process of forming the four figures and deriving charts from the four figures. The structure of this module follows recommendations from http://docs.python-guide.org/en/latest/writing/structure/
 
-Examples
---------
+How to Run
+----------
+To run, go to the terminal, CD into the top-level folder, and run 
+"python run.py".
+
+To run tests, go to the terminal, CD into the top-level folder and run 
+"pytest".
 
 Links
 -----
