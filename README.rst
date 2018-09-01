@@ -23,3 +23,4 @@ How to Run
 Links
 -----
 * https://github.com/ncriver/geomancy
+* Have fun!
